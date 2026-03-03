@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+	<apikit:config outboundHeadersMapName="outboundHeadersMapName" httpStatusVarName="httpStatus" doc:name="Router" doc:id="5d879bd1-6990-4c75-8dcf-fea662aebd28" name="Router" api="null" disableValidations="true"/>
+	<error-handler name="mule-error-handlerError_Handler" doc:id="411a23f7-3aee-4649-9513-f97b6aaf885d" >
+
+	<on-error-propagate type="APIKIT:BAD_REQUEST">
+			<logger level="ERROR" doc:name="Logger" doc:id="0f83a88e-2378-4324-b88d-5b84982daefa" message="#[error.description]"/>
+			<ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{code:400,message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                        <ee:set-variable variableName="httpMsg" ><![CDATA["Bad Request"]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            
+</on-error-propagate>
+            <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3d537ccd-9445-49f6-9666-84b093aaf5ac" type="APIKIT:UNAUTHORIZED">
+			<logger level="ERROR" doc:name="Logger" doc:id="c9eb1717-f4a4-412b-addf-ef2971c8549f" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message" doc:id="7a3f6dc0-458b-4b36-8afe-907e7111dcc2" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{code:401,message: "Unauthorized"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[401]]></ee:set-variable>
+					<ee:set-variable variableName="httpMsg" ><![CDATA["Unauthorized"]]></ee:set-variable>
+				
+</ee:variables>
+			</ee:transform>
+		
+</on-error-propagate>
+		 <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c953dc77-f283-4c2a-bc1a-34f04ec11894" type="APIKIT:FORBIDDEN">
+			<logger level="ERROR" doc:name="Logger" doc:id="1adfd04c-8316-4441-b618-a391aee76b4b" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message" doc:id="f22eb495-98f2-4470-981a-14a9c6304195" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{code:403,message: "Forbidden"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[403]]></ee:set-variable>
+				<ee:set-variable variableName="httpMsg" ><![CDATA["Forbidden"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		
+</on-error-propagate>
+		
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <logger level="ERROR" doc:name="Logger" doc:id="73446a7f-42df-4078-aa72-e7ff603bdbd7" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{code:404,message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                        <ee:set-variable variableName="httpMsg" ><![CDATA["Not Found"]]></ee:set-variable>
+                        
+                    </ee:variables>
+                </ee:transform>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <logger level="ERROR" doc:name="Logger" doc:id="6f2ab7bb-355d-42f2-9302-301d60d68688" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{code:405,message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                        <ee:set-variable variableName="httpMsg" ><![CDATA["Method Not Allowed"]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:REQUEST_TIMEOUT">
+                <logger level="ERROR" doc:name="Logger" doc:id="9bbac34c-1b22-4afe-a2d3-494cb7a5a7f5" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{code:408,message: "Request Timeout"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">408</ee:set-variable>
+                        <ee:set-variable variableName="httpMsg" ><![CDATA["Request Timeout"]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <logger level="ERROR" doc:name="Logger" doc:id="d862bbe8-9427-44fc-9c3d-1c229889182a" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{code:415,message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                        <ee:set-variable variableName="httpMsg" ><![CDATA["unsupport Media Type"]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="624269ae-eca1-4af9-a0be-b63cf30e1959" type="APIKIT:INTERNAL_SERVER_ERROR">
+			<logger level="ERROR" doc:name="Logger" doc:id="8db8841f-03bc-444c-91be-8e1070d71c5c" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message" doc:id="95b048d5-530d-414b-b81d-07a8ea50cd27" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{code:500,message: "Internal Server Error"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+					<ee:set-variable variableName="httpMsg" ><![CDATA["Internal Server Error"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <logger level="ERROR" doc:name="Logger" doc:id="5a099b1f-54ae-477e-a1b8-a6bd18e973c5" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{code:501,message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                        <ee:set-variable variableName="httpMsg" ><![CDATA["Not Implemented"]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df1a15c5-e293-4d39-9f36-2e6a2ea40a3c" type="APIKIT:BAD_GATEWAY">
+			<logger level="ERROR" doc:name="Logger" doc:id="b69c3486-6897-424f-a522-fc635055f901" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message" doc:id="33515356-b966-4564-aafb-5d2f93b4dd6e" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{code:502,message: "Bad Gateway"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[502]]></ee:set-variable>
+					<ee:set-variable variableName="httpMsg" ><![CDATA["Bad Gateway"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5e5d3a96-48e5-449c-b6b2-eeb942b113ba" type="APIKIT:SERVICE_UNAVAILABLE">
+			<logger level="ERROR" doc:name="Logger" doc:id="a7dd202b-33ee-4e11-b418-fb1f66a67ba2" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message" doc:id="49f05a7f-3959-44ec-abe4-1db00a7b7fec" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{code:503,message: "Service Unavailable"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[503]]></ee:set-variable>
+					<ee:set-variable variableName="httpMsg" ><![CDATA["Service Unavailable"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7a2fbaa0-b4b5-4d8c-b2a0-64d6412a1b5f" type="APIKIT:GATEWAY_TIMEOUT">
+			<logger level="ERROR" doc:name="Logger" doc:id="5d8dfaf3-517e-4d82-89ab-5d64cb3e3b23" message="#[error.description]" />
+			<ee:transform doc:name="Transform Message" doc:id="40b91fc4-0e8f-489c-8e7a-9fef25c3a164">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{code:511,message: "Gateway Timeout"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[504]]></ee:set-variable>
+					<ee:set-variable variableName="httpMsg" ><![CDATA["Gateway Timeout"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		
+</on-error-propagate>
+		
+</error-handler>
+</mule>
